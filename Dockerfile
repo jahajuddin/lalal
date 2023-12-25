@@ -1,8 +1,10 @@
 # Use the Windows Server Core base image
 FROM mcr.microsoft.com/windows/servercore:ltsc2019
 
-# Set metadata for an image
-LABEL maintainer="Your Name <your.email@example.com>"
+# Set demo metadata for an image
+LABEL maintainer="Demo User <demo.user@example.com>" \
+      description="Windows Server Core with RDP enabled on port 8080" \
+      version="1.0"
 
 # Create a new user
 RUN net user /add Andreslon
