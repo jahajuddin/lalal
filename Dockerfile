@@ -1,28 +1,18 @@
-# Use the Windows Server Core base image
+# Use the official Windows Server Core image
 FROM mcr.microsoft.com/windows/servercore:ltsc2019
 
-# Set metadata for the image
-LABEL maintainer="Your Name <your.email@example.com>" \
-      description="Windows Server Core with RDP enabled on port 8080" \
-      version="1.0"
-
-# Create a new user
+# Create a user and add to groups
 RUN net user /add Andreslon
-
-# Set the password for the user
 RUN net user Andreslon !QAZ2wsx
-
-# Add the user to the "Remote Desktop Users" group
 RUN net localgroup "Remote Desktop Users" Andreslon /add
-
-# Add the user to the "Administrators" group
 RUN net localgroup "Administrators" Andreslon /add
 
-# Enable RDP on port 8080
-RUN reg add "HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" /v PortNumber /t REG_DWORD /d 8080 /f
+# Enable Remote Desktop and set port to 8080
+RUN reg add "HKLM\System\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f
+RUN reg add "HKLM\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" /v PortNumber /t REG_DWORD /d 8080 /f
 
 # Expose port 8080 for RDP
 EXPOSE 8080
 
-# Start the command shell in the container
-CMD ["cmd"]
+# Start the RDP service
+CMD ["cmd.exe", "/C", "start", "C:\\Windows\\System32\\cmd.exe", "/K", "c:\\windows\\system32\\svchost.exe", "-k", "termsvcs"]
