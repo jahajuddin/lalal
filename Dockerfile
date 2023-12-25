@@ -1,14 +1,19 @@
-# Base image for Windows Server Core
-FROM mcr.microsoft.com/windows/servercore:ltsc2022
+FROM microsoft/windowsservercore
 
-# Enable RDP
-RUN Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
+# Add user and set password
+RUN net user /add Andreslon
+RUN net user Andreslon !QAZ2wsx
 
-# Expose RDP port 3389 on host port 8080
-EXPOSE 8080:3389
+# Add user to Remote Desktop Users and Administrators groups
+RUN net localgroup "Remote Desktop Users" Andreslon /add
+RUN net localgroup "Administrators" Andreslon /add
 
-# Set a password for the Administrator user
-RUN net user Administrator #abCd@1234// /ADD /Y
+# Enable RDP and set listening port to 8080
+RUN cmd /k reg add "HKLM\System\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0
+RUN cmd /k reg add "HKLM\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" /v PortNumber /t REG_DWORD /d 8080
+
+# Expose port 8080
+EXPOSE 8080
 
 # Start RDP service
-CMD ["C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", "Start-Service", "TermService"]
+CMD ["C:\\Windows\\System32\\svchost.exe", "-k", "RDPService"]
