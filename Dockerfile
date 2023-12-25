@@ -1,8 +1,8 @@
 # Use the Windows Server Core base image
 FROM mcr.microsoft.com/windows/servercore:ltsc2019
 
-# Set demo metadata for an image
-LABEL maintainer="Demo User <demo.user@example.com>" \
+# Set metadata for the image
+LABEL maintainer="Your Name <your.email@example.com>" \
       description="Windows Server Core with RDP enabled on port 8080" \
       version="1.0"
 
